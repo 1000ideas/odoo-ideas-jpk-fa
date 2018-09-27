@@ -1,60 +1,62 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="ideas_jpk_fa.list">
-      <field name="name">ideas_jpk_fa list</field>
-      <field name="model">ideas_jpk_fa.ideas_jpk_fa</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
+      <record id="ideas_jpk_fa_view" model="ir.ui.view">
+          <field name="name">Ideas JPK FA</field>
+          <field name="model">ideas_jpk_fa.generator</field>
+          <field name="priority">1</field>
+          <field name="arch" type="xml">
+              <form string="Select date range">
+                  <header>
+                      <h2>JPK FA</h2>
+                      <p><small>https://www.mf.gov.pl/documents/764034/6432412/20180926_broszura_JPK_FA.pdf</small></p>
+                  </header>
+                  <sheet>
+                      <group col="4" colspan="4">
+                          <group colspan="2" col="2">
+                              <field name="dateStart" string="Data początkowa okresu, którego dotyczy JPK_FA" />
+                              <field name="dateEnd" string="Data końcowa okresu, którego dotyczy JPK_FA" />
+                              <field name="purpose" string="Cel zlozenia" />
+                              <field name="uscode" string='Czterocyfrowy kod urzędu skarbowego wg słownika' />
+                              <a href="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v4-0E.xsd">Słownik</a>
+                          </group>
+                          <group colspan="2" col="2">
+                              <field name="company" options="{'no_create': True}" string="Firma" />
+                              <field name="currency" options="{'no_create': True}" string="Waluta" />
+                          </group>
+                      </group>
+                  </sheet>
+                  <footer>
+                      <button name="generate_file" string="_Generate" type="object" class="btn-default" />
+                      <button string="Cancel" class="btn-default" special="cancel"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
 
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="ideas_jpk_fa.action_window">
-      <field name="name">ideas_jpk_fa window</field>
-      <field name="res_model">ideas_jpk_fa.ideas_jpk_fa</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
 
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="ideas_jpk_fa.action_server">
-      <field name="name">ideas_jpk_fa server</field>
-      <field name="model_id" ref="model_ideas_jpk_fa_ideas_jpk_fa"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
+      <record id="journal_dashboard_view_inherit_jpk" model="ir.ui.view">
+          <field name="name">ideas_jpk_fa.journal.dashboard.kanban.inherit</field>
+          <field name="model">account.journal</field>
+          <field name="inherit_id" ref="account.account_journal_dashboard_kanban_view"/>
+          <field name="arch" type="xml">
+              <xpath expr='//button[@name="action_create_new"]' position="after">
+                  <div>
+                      <button type="action" name="ideas_jpk_fa.action_generate" class="btn btn-sm">
+                          <span>JPK FA</span>
+                      </button>
+                  </div>
+              </xpath>
+          </field>
+      </record>
 
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="ideas_jpk_fa" id="ideas_jpk_fa.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="ideas_jpk_fa.menu_1" parent="ideas_jpk_fa.menu_root"/>
-    <menuitem name="Menu 2" id="ideas_jpk_fa.menu_2" parent="ideas_jpk_fa.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="ideas_jpk_fa.menu_1_list" parent="ideas_jpk_fa.menu_1"
-              action="ideas_jpk_fa.action_window"/>
-    <menuitem name="Server to list" id="ideas_jpk_fa" parent="ideas_jpk_fa.menu_2"
-              action="ideas_jpk_fa.action_server"/>
-    -->
+      <record id="action_generate" model="ir.actions.act_window">
+          <field name="name">JPK FA</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">ideas_jpk_fa.generator</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+          <field name="view_id" ref="ideas_jpk_fa_view"/>
+      </record>
   </data>
 </odoo>
