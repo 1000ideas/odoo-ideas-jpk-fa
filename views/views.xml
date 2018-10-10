@@ -22,6 +22,20 @@
                           <group colspan="2" col="2">
                               <field name="company" options="{'no_create': True}" string="Firma" />
                               <field name="currency" options="{'no_create': True}" string="Waluta" />
+                              <field name="regon" string="REGON" />
+                          </group>
+                      </group>
+                      <group col="4" colspan="4">
+                          <group colspan="2" col="2">
+                              <field name="county" string="Powiat" />
+                              <field name="municipality" string="Gmina" />
+                              <field name="post" string='Poczta' />
+                              <field name="street" string='Ulica' />
+                              <field name="buildingNumber" string='Numer domu' />
+                              <field name="flatNumber" string='Numer lokalu' />
+                          </group>
+                          <group colspan="2" col="2">
+
                           </group>
                       </group>
                   </sheet>
