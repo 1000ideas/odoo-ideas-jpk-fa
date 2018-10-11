@@ -38,7 +38,7 @@ class ideas_jpk_fa(models.TransientModel):
                         ('date_invoice', '<=', self.dateEnd),
                         ('company_id', '=', self.company.id),
                         ('currency_id', '=', self.currency.id),
-                        ('type', '=', 'out_invoice'),
+                        ('type', 'in', ('out_invoice', 'out_refund',)),
                         ('state', 'in', ('paid', 'open',))
         ])
 
@@ -125,6 +125,14 @@ class ideas_jpk_fa(models.TransientModel):
                 else:
                     faktura.appendChild(self.create_element(doc, 'P5B', bVat))
             faktura.appendChild(self.create_element(doc, 'P6', i.date_invoice))
+            faktura.appendChild(self.create_element(doc, 'P_15', i.amount_total))
+            if i.type == 'out_invoice':
+                faktura.appendChild(self.create_element(doc, 'RodzajFaktury', 'VAT'))
+            elif i.type == 'out_refund':
+                faktura.appendChild(self.create_element(doc, 'RodzajFaktury', 'KOREKTA'))
+                faktura.appendChild(self.create_element(doc, 'PrzyczynaKorekty', i.name))
+                faktura.appendChild(self.create_element(doc, 'NrFaKorygowanej', i.origin))
+                faktura.appendChild(self.create_element(doc, 'OkresFaKorygowanej', i.date_invoice))
 
             jpk.appendChild(faktura)
 
