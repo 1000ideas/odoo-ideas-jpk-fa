@@ -73,7 +73,7 @@ class ideas_jpk_fa(models.TransientModel):
         podmiot1 = doc.createElement('Podmiot1')
 
         identyfikatorPodmiotu = doc.createElement('IdentyfikatorPodmiotu')
-        sVat = re.split('(\d+)',str(self.company.partner_id.vat))
+        sVat = re.split('(\d+)',str(self.company.partner_id.vat).strip())
         if sVat:
             if len(sVat) > 1:
                 identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:NIP', sVat[1]))
@@ -115,18 +115,20 @@ class ideas_jpk_fa(models.TransientModel):
             faktura.appendChild(self.create_element(doc, 'P_3C', self.company.partner_id.name))
             faktura.appendChild(self.create_element(doc, 'P_3D', str(self.company.partner_id.city) + ' ' + str(self.company.partner_id.zip) + ', ' + str(self.company.partner_id.street) ))
 
-            sVat = re.split('(\d+)',str(self.company.partner_id.vat))
+            sVat = re.split('(\d+)',str(self.company.partner_id.vat).strip())
             if sVat:
                 if len(sVat) > 1:
-                    faktura.appendChild(self.create_element(doc, 'P_4A', sVat[0]))
+                    if sVat[0]:
+                        faktura.appendChild(self.create_element(doc, 'P_4A', sVat[0]))
                     faktura.appendChild(self.create_element(doc, 'P_4B', sVat[1]))
                 else:
                     faktura.appendChild(self.create_element(doc, 'P_4B', self.company.partner_id.vat))
 
-            bVat = re.split('(\d+)',str(i.partner_id.vat))
+            bVat = re.split('(\d+)',str(i.partner_id.vat).strip())
             if bVat:
                 if len(bVat) > 1:
-                    faktura.appendChild(self.create_element(doc, 'P_5A', bVat[0]))
+                    if bVat[0]:
+                        faktura.appendChild(self.create_element(doc, 'P_5A', bVat[0]))
                     faktura.appendChild(self.create_element(doc, 'P_5B', bVat[1]))
                 else:
                     faktura.appendChild(self.create_element(doc, 'P_5B', i.partner_id.vat))
