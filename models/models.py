@@ -228,6 +228,7 @@ class ideas_jpk_fa(models.TransientModel):
                 fakturaWiersz.setAttribute("typ", "G")
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_2B', i.number))
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_7', l.name))
+                fakturaWiersz.appendChild(self.create_element(doc, 'P_8A', 'szt.'))
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_8B', str(round(l.quantity, 2))))
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_9A', str(round(l.price_unit, 2))))
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_11', str(round(l.price_subtotal, 2))))
