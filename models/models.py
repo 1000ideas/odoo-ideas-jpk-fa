@@ -60,7 +60,7 @@ class ideas_jpk_fa(models.TransientModel):
         naglowek.appendChild(kodFormularza)
         naglowek.appendChild(self.create_element(doc, 'WariantFormularza', '1'))
         naglowek.appendChild(self.create_element(doc, 'CelZlozenia', self.purpose))
-        local_date = datetime.datetime.now().astimezone(local_tz).strftime('%Y-%m-%dT%H:%M')
+        local_date = datetime.datetime.now().astimezone(local_tz).strftime('%Y-%m-%dT%H:%M:%S')
         naglowek.appendChild(self.create_element(doc, 'DataWytworzeniaJPK', local_date))
         naglowek.appendChild(self.create_element(doc, 'DataOd', self.dateStart))
         naglowek.appendChild(self.create_element(doc, 'DataDo', self.dateEnd))
@@ -73,7 +73,13 @@ class ideas_jpk_fa(models.TransientModel):
         podmiot1 = doc.createElement('Podmiot1')
 
         identyfikatorPodmiotu = doc.createElement('IdentyfikatorPodmiotu')
-        identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:NIP', self.company.partner_id.vat))
+        sVat = re.split('(\d+)',str(self.company.partner_id.vat))
+        if sVat:
+            if len(sVat) > 1:
+                identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:NIP', sVat[1]))
+            else:
+                identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:NIP', self.company.partner_id.vat))
+
         identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:PelnaNazwa', self.company.partner_id.name))
         if self.regon:
             identyfikatorPodmiotu.appendChild(self.create_element(doc, 'etd:REGON', self.regon))
@@ -102,30 +108,40 @@ class ideas_jpk_fa(models.TransientModel):
             invoicesTotalValue += i.amount_total
             faktura = doc.createElement('Faktura')
             faktura.setAttribute("typ", "G")
-            faktura.appendChild(self.create_element(doc, 'P1', i.date))
-            faktura.appendChild(self.create_element(doc, 'P2A', i.number))
-            faktura.appendChild(self.create_element(doc, 'P3A', i.partner_id.name))
-            faktura.appendChild(self.create_element(doc, 'P3B', ( str(i.partner_id.city) + ' ' + str(i.partner_id.zip)) + ', ' + str(i.partner_id.street) ))
-            faktura.appendChild(self.create_element(doc, 'P3C', self.company.partner_id.name))
-            faktura.appendChild(self.create_element(doc, 'P3D', str(self.company.partner_id.city) + ' ' + str(self.company.partner_id.zip) + ', ' + str(self.company.partner_id.street) ))
+            faktura.appendChild(self.create_element(doc, 'P_1', i.date))
+            faktura.appendChild(self.create_element(doc, 'P_2A', i.number))
+            faktura.appendChild(self.create_element(doc, 'P_3A', i.partner_id.name))
+            faktura.appendChild(self.create_element(doc, 'P_3B', ( str(i.partner_id.city) + ' ' + str(i.partner_id.zip)) + ', ' + str(i.partner_id.street) ))
+            faktura.appendChild(self.create_element(doc, 'P_3C', self.company.partner_id.name))
+            faktura.appendChild(self.create_element(doc, 'P_3D', str(self.company.partner_id.city) + ' ' + str(self.company.partner_id.zip) + ', ' + str(self.company.partner_id.street) ))
 
             sVat = re.split('(\d+)',str(self.company.partner_id.vat))
             if sVat:
                 if len(sVat) > 1:
-                    faktura.appendChild(self.create_element(doc, 'P4A', sVat[0]))
-                    faktura.appendChild(self.create_element(doc, 'P4B', sVat[1]))
+                    faktura.appendChild(self.create_element(doc, 'P_4A', sVat[0]))
+                    faktura.appendChild(self.create_element(doc, 'P_4B', sVat[1]))
                 else:
-                    faktura.appendChild(self.create_element(doc, 'P4B', sVat))
+                    faktura.appendChild(self.create_element(doc, 'P_4B', self.company.partner_id.vat))
 
             bVat = re.split('(\d+)',str(i.partner_id.vat))
             if bVat:
                 if len(bVat) > 1:
-                    faktura.appendChild(self.create_element(doc, 'P5A', bVat[0]))
-                    faktura.appendChild(self.create_element(doc, 'P5B', bVat[1]))
+                    faktura.appendChild(self.create_element(doc, 'P_5A', bVat[0]))
+                    faktura.appendChild(self.create_element(doc, 'P_5B', bVat[1]))
                 else:
-                    faktura.appendChild(self.create_element(doc, 'P5B', bVat))
-            faktura.appendChild(self.create_element(doc, 'P6', i.date_invoice))
-            faktura.appendChild(self.create_element(doc, 'P_15', i.amount_total))
+                    faktura.appendChild(self.create_element(doc, 'P_5B', i.partner_id.vat))
+
+            faktura.appendChild(self.create_element(doc, 'P_6', i.date_invoice))
+            faktura.appendChild(self.create_element(doc, 'P_15', str(round(i.amount_total, 2)) ))
+            faktura.appendChild(self.create_element(doc, 'P_16', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_17', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_18', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_19', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_20', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_21', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_23', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_106E_2', 'false' ))
+            faktura.appendChild(self.create_element(doc, 'P_106E_3', 'false' ))
             if i.type == 'out_invoice':
                 faktura.appendChild(self.create_element(doc, 'RodzajFaktury', 'VAT'))
             elif i.type == 'out_refund':
@@ -137,10 +153,11 @@ class ideas_jpk_fa(models.TransientModel):
             jpk.appendChild(faktura)
 
         # FakturaCtrl
-        fakturaCtrl = doc.createElement('FakturaCtrl')
-        fakturaCtrl.appendChild(self.create_element(doc, 'LiczbaFaktur', len(invoices)))
-        fakturaCtrl.appendChild(self.create_element(doc, 'WartoscFaktur', str(round(invoicesTotalValue, 2))))
-        jpk.appendChild(fakturaCtrl)
+        if len(invoices) > 0:
+            fakturaCtrl = doc.createElement('FakturaCtrl')
+            fakturaCtrl.appendChild(self.create_element(doc, 'LiczbaFaktur', len(invoices)))
+            fakturaCtrl.appendChild(self.create_element(doc, 'WartoscFaktur', str(round(invoicesTotalValue, 2))))
+            jpk.appendChild(fakturaCtrl)
 
         # StawkiPodatku
         stawkiPodatku = doc.createElement('StawkiPodatku')
@@ -168,14 +185,15 @@ class ideas_jpk_fa(models.TransientModel):
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_11', str(round(l.price_subtotal, 2))))
                 fakturaWiersz.appendChild(self.create_element(doc, 'P_11A', str(round(l.price_total, 2))))
                 for t in l.invoice_line_tax_ids:
-                    fakturaWiersz.appendChild(self.create_element(doc, 'P_12', t.amount))
+                    fakturaWiersz.appendChild(self.create_element(doc, 'P_12', str(round(t.amount)) ))
                 jpk.appendChild(fakturaWiersz)
 
         # FakturaWierszCtrl
-        fakturaWierszCtrl = doc.createElement('FakturaWierszCtrl')
-        fakturaWierszCtrl.appendChild(self.create_element(doc, 'LiczbaWierszyFaktur', linesCount))
-        fakturaWierszCtrl.appendChild(self.create_element(doc, 'WartoscWierszyFaktur', str(round(linesValue, 2))))
-        jpk.appendChild(fakturaWierszCtrl)
+        if len(invoices) > 0:
+            fakturaWierszCtrl = doc.createElement('FakturaWierszCtrl')
+            fakturaWierszCtrl.appendChild(self.create_element(doc, 'LiczbaWierszyFaktur', linesCount))
+            fakturaWierszCtrl.appendChild(self.create_element(doc, 'WartoscWierszyFaktur', str(round(linesValue, 2)) ))
+            jpk.appendChild(fakturaWierszCtrl)
 
         doc.appendChild(jpk)
 
