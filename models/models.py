@@ -105,6 +105,17 @@ class ideas_jpk_fa(models.TransientModel):
         # Faktura - collection
         invoicesTotalValue = 0
         for i in invoices:
+            v23_val = 0
+            v23_tax = 0
+            v8_val = 0
+            v8_tax = 0
+            v5_val = 0
+            v5_tax = 0
+            v0_val = 0
+            vz_val = 0
+            vunknown_val = 0
+            vunknown_tax = 0
+
             invoicesTotalValue += i.amount_total
             faktura = doc.createElement('Faktura')
             faktura.setAttribute("typ", "G")
@@ -134,6 +145,41 @@ class ideas_jpk_fa(models.TransientModel):
                     faktura.appendChild(self.create_element(doc, 'P_5B', i.partner_id.vat))
 
             faktura.appendChild(self.create_element(doc, 'P_6', i.date_invoice))
+            for t in i.tax_line_ids:
+                if t.tax_id.description == 'V23' or t.tax_id.description == 'V22':
+                    v23_val += round(t.base, 2)
+                    v23_tax += round(t.amount, 2)
+                elif t.tax_id.description == 'V8' or t.tax_id.description == 'V7':
+                    v8_val += round(t.base, 2)
+                    v8_tax += round(t.amount, 2)
+                elif t.tax_id.description == 'V5':
+                    v5_val += round(t.base, 2)
+                    v5_tax += round(t.amount, 2)
+                elif t.tax_id.description == 'V0':
+                    v0_val += round(t.base, 2)
+                elif t.tax_id.description == 'VZW' or t.tax_id.description == 'NP':
+                    vz_val += round(t.base, 2)
+                else:
+                    vunknown_val += round(t.base, 2)
+                    vunknown_tax += round(t.amount, 2)
+
+            if v23_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_1', str(v23_val) ))
+                faktura.appendChild(self.create_element(doc, 'P_14_1', str(v23_tax) ))
+            if v8_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_2', str(v8_val) ))
+                faktura.appendChild(self.create_element(doc, 'P_14_2', str(v8_tax) ))
+            if v5_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_3', str(v5_val) ))
+                faktura.appendChild(self.create_element(doc, 'P_14_3', str(v5_tax) ))
+            if vunknown_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_4', str(vunknown_val) ))
+                faktura.appendChild(self.create_element(doc, 'P_14_4', str(vunknown_tax) ))
+            if v0_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_6', str(v0_val) ))
+            if vz_val > 0:
+                faktura.appendChild(self.create_element(doc, 'P_13_7', str(vz_val) ))
+
             faktura.appendChild(self.create_element(doc, 'P_15', str(round(i.amount_total, 2)) ))
             faktura.appendChild(self.create_element(doc, 'P_16', 'false' ))
             faktura.appendChild(self.create_element(doc, 'P_17', 'false' ))
